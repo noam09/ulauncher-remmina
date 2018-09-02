@@ -1,0 +1,20 @@
+{
+  "manifest_version": "1",
+  "api_version": "1",
+  "name": "Remmina",
+  "description": "Quick access to Remmina profiles",
+  "developer_name": "noam09",
+  "icon": "images/icon.svg",
+  "options": {
+    "query_debounce": 0.1
+  },
+  "preferences": [
+    {
+      "id": "remmina",
+      "type": "keyword",
+      "name": "Remmina",
+      "description": "Quick access to Remmina profiles",
+      "default_value": "r"
+    }
+  ]
+}
