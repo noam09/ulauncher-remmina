@@ -1,6 +1,6 @@
 # ulauncher-remmina
 
-🖥 Ulauncher extension for quick access to [Remmina](https://remmina.org) profiles.
+🖥 [Ulauncher](https://ulauncher.io) extension for quick access to [Remmina](https://remmina.org) profiles.
 
 You can enter several queries to match strings in profiles' descriptions (e.g. `r ssh stan`)
 

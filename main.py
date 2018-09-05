@@ -1,16 +1,31 @@
 import os
+import json
 import logging
 import distutils.spawn
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
-from ulauncher.api.shared.event import KeywordQueryEvent
+from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 from ulauncher.api.shared.item.SmallResultItem import SmallResultItem
 from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
 from ulauncher.api.shared.action.RunScriptAction import RunScriptAction
+from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
+
+global usage_cache
+usage_cache = {}
+
+# Usage tracking
+script_directory = os.path.dirname(os.path.realpath(__file__))
+usage_db = os.path.join(script_directory, 'usage.json')
+if os.path.exists(usage_db):
+    with open(usage_db, 'r') as db:
+        # Read JSON string
+        raw = db.read()
+        # JSON to dict
+        usage_cache = json.loads(raw)
 
 # Initialize items cache and Remmina profiles path
 remmina_bin = ''
@@ -32,6 +47,7 @@ class RemminaExtension(Extension):
 
         super(RemminaExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+        self.subscribe(ItemEnterEvent, ItemEnterEventListener())
 
     def list_profiles(self, query):
         profiles = []
@@ -59,6 +75,7 @@ class RemminaExtension(Extension):
             if (query in base.lower()) or all(x in desc for x in keywords):
                 items_cache.append(create_item(title, proto, p, desc, p))
 
+        items_cache = sorted(items_cache, key=sort_by_usage, reverse=True)
         return items_cache
 
 
@@ -69,7 +86,28 @@ class KeywordQueryEventListener(EventListener):
         # Display all items when query empty
         profiles_list = extension.list_profiles(term)
 
-        return RenderResultListAction(profiles_list)
+        return RenderResultListAction(profiles_list[:8])
+
+
+class ItemEnterEventListener(EventListener):
+    def on_event(self, event, extension):
+        global usage_cache
+        # Get query
+        data = event.get_data()
+        on_enter = data['id']
+        # The profilefile name is the ID
+        base = os.path.basename(on_enter)
+        b = os.path.splitext(base)[0]
+        # Check usage and increment
+        if b in usage_cache:
+            usage_cache[b] = usage_cache[b]+1
+        else:
+            usage_cache[b] = 1
+        # Update usage JSON
+        with open(usage_db, 'w') as db:
+            db.write(json.dumps(usage_cache, indent=2))
+
+        return RunScriptAction('#!/usr/bin/env bash\n{} -c {}\n'.format(remmina_bin, on_enter), None).run()
 
 
 def create_item(name, icon, keyword, description, on_enter):
@@ -77,8 +115,20 @@ def create_item(name, icon, keyword, description, on_enter):
             name=name,
             description=description,
             icon='images/{}.svg'.format(icon),
-            on_enter=RunScriptAction('#!/usr/bin/env bash\n{} -c {}\n'.format(remmina_bin, on_enter), None)
-    )
+            on_enter=ExtensionCustomAction(
+                 {'id': on_enter})
+            )
+
+
+def sort_by_usage(i):
+    global usage_cache
+    # Convert item name to ID format
+    j = i._name.lower()
+    # Return score according to usage
+    if j in usage_cache:
+        return usage_cache[j]
+    # Default is 0 (no usage rank / unused)
+    return 0
 
 
 def profile_details(profile_path):
