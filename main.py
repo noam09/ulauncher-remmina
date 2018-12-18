@@ -65,8 +65,7 @@ class RemminaExtension(Extension):
 
         for p in profiles:
             base = os.path.basename(p)
-            title = os.path.splitext(base)[0]
-            desc, proto = profile_details(p)
+            title, desc, proto = profile_details(p)
             # Search for query inside filename and profile description
             # Multiple strings can be used to search in description
             # all() is used to achieve a AND search (include all keywords)
@@ -181,7 +180,7 @@ def profile_details(profile_path):
             desc = "{name} | {server} {group}".format(name=name,
                                                       server=server,
                                                       group=group)
-            return desc, proto
+            return name, desc, proto
     else:
         # Default values
         return "", "rdp"
