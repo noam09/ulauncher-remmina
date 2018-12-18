@@ -177,7 +177,7 @@ def profile_details(profile_path):
                                                      server=server)
             if len(group) > 0:
                 group = " | {group}".format(group=group)
-            desc = "{name} | {server} {group}".format(name=name,
+            desc = "{server} {group}".format(
                                                       server=server,
                                                       group=group)
             return name, desc, proto
