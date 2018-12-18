@@ -71,7 +71,7 @@ class RemminaExtension(Extension):
             # all() is used to achieve a AND search (include all keywords)
             keywords = query.split(" ")
             # if (query in base.lower()) or (query in desc.lower()):
-            if (query in base.lower()) or all(x in desc for x in keywords):
+            if (query in base.lower()) or (query in title.lower()) or all(x in desc for x in keywords):
                 items_cache.append(create_item(title, proto, p, desc, p))
 
         items_cache = sorted(items_cache, key=sort_by_usage, reverse=True)
