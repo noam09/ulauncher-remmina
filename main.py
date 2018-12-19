@@ -177,13 +177,13 @@ def profile_details(profile_path):
                                                      server=server)
             if len(group) > 0:
                 group = " | {group}".format(group=group)
-            desc = "{server} {group}".format(
-                                                      server=server,
-                                                      group=group)
+            # Final description string
+            desc = "{server} {group}".format(server=server,
+                                             group=group)
             return name, desc, proto
     else:
         # Default values
-        return "", "rdp"
+        return "", "", "rdp"
 
 
 if __name__ == '__main__':
