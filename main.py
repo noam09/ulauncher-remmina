@@ -65,14 +65,13 @@ class RemminaExtension(Extension):
 
         for p in profiles:
             base = os.path.basename(p)
-            title = os.path.splitext(base)[0]
-            desc, proto = profile_details(p)
+            title, desc, proto = profile_details(p)
             # Search for query inside filename and profile description
             # Multiple strings can be used to search in description
             # all() is used to achieve a AND search (include all keywords)
             keywords = query.split(" ")
             # if (query in base.lower()) or (query in desc.lower()):
-            if (query in base.lower()) or all(x in desc for x in keywords):
+            if (query in base.lower()) or (query in title.lower()) or all(x in desc for x in keywords):
                 items_cache.append(create_item(title, proto, p, desc, p))
 
         items_cache = sorted(items_cache, key=sort_by_usage, reverse=True)
@@ -178,10 +177,10 @@ def profile_details(profile_path):
                                                      server=server)
             if len(group) > 0:
                 group = " | {group}".format(group=group)
-            desc = "{name} | {server} {group}".format(name=name,
+            desc = "{server} {group}".format(
                                                       server=server,
                                                       group=group)
-            return desc, proto
+            return name, desc, proto
     else:
         # Default values
         return "", "rdp"
