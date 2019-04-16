@@ -15,6 +15,13 @@
       "name": "Remmina",
       "description": "Quick access to Remmina profiles",
       "default_value": "r"
+    },
+    {
+      "id": "profiles",
+      "type": "input",
+      "name": "Remmina Profiles Directory",
+      "description": "Where Remmina stores profile configuration files <br /><code>~/.local/share/remmina</code> and <code>~/.remmina</code> are checked by default",
+      "default_value": ""
     }
   ]
 }

@@ -19,7 +19,7 @@ usage_cache = {}
 
 # Usage tracking
 script_directory = os.path.dirname(os.path.realpath(__file__))
-usage_db = os.path.join(script_directory, 'usage.json')
+usage_db = os.path.join(script_directory, "usage.json")
 if os.path.exists(usage_db):
     with open(usage_db, 'r') as db:
         # Read JSON string
@@ -28,18 +28,23 @@ if os.path.exists(usage_db):
         usage_cache = json.loads(raw)
 
 # Initialize items cache and Remmina profiles path
-remmina_bin = ''
+remmina_bin = ""
 # Locate Remmina profiles and binary
-remmina_profiles_path = "{}/.local/share/remmina".format(os.environ.get('HOME'))
+default_paths = ["{}/.local/share/remmina".format(os.environ.get('HOME')),
+                 "{}/.remmina".format(os.environ.get('HOME'))]
+# remmina_profiles_path = "{}/.local/share/remmina".format(os.environ.get('HOME'))
+# remmina_profiles_path_alt = "{}/.remmina".format(os.environ.get('HOME'))
 remmina_bin = distutils.spawn.find_executable('remmina')
 # This extension is useless without remmina
-if remmina_bin is None or remmina_bin == '':
-    logger.error('Remmina executable path could not be determined')
+if remmina_bin is None or remmina_bin == "":
+    logger.error("Remmina executable path could not be determined")
     exit()
 # Check if Remmina profiles directory exists
-if not os.path.isdir(remmina_profiles_path):
-    logger.error("Remmina profiles directory doesn't exist ({})".format(remmina_profiles_path))
-    exit()
+remmina_profiles_path = None
+# Check default paths first
+for p in default_paths:
+    if os.path.isdir(p):
+        remmina_profiles_path = p
 
 
 class RemminaExtension(Extension):
@@ -61,8 +66,7 @@ class RemminaExtension(Extension):
             temp = profiles
             profiles = sorted(temp)
         except Exception as e:
-            print('Failed getting profile files')
-
+            logger.error("Failed getting Remmina profile files")
         for p in profiles:
             base = os.path.basename(p)
             title, desc, proto = profile_details(p)
@@ -82,11 +86,17 @@ class RemminaExtension(Extension):
 
 class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
+        global remmina_profiles_path
+        if extension.preferences["profiles"] is not "" \
+           or not remmina_profiles_path:
+            # Tilde (~) won't work alone, need expanduser()
+            remmina_profiles_path = os.path.expanduser(extension.preferences["profiles"])
+        # pref_profiles_path = extension.preferences['profiles']
+        logger.debug("Remmina profiles path: {}".format(remmina_profiles_path))
         # Get query
-        term = (event.get_argument() or '').lower()
+        term = (event.get_argument() or "").lower()
         # Display all items when query empty
         profiles_list = extension.list_profiles(term)
-
         return RenderResultListAction(profiles_list[:8])
 
 
@@ -95,7 +105,7 @@ class ItemEnterEventListener(EventListener):
         global usage_cache
         # Get query
         data = event.get_data()
-        on_enter = data['id']
+        on_enter = data["id"]
         # The profilefile name is the ID
         base = os.path.basename(on_enter)
         b = os.path.splitext(base)[0]
@@ -107,7 +117,6 @@ class ItemEnterEventListener(EventListener):
         # Update usage JSON
         with open(usage_db, 'w') as db:
             db.write(json.dumps(usage_cache, indent=2))
-
         return RunScriptAction('#!/usr/bin/env bash\n{} -c {}\n'.format(remmina_bin, on_enter), None).run()
 
 
@@ -115,9 +124,9 @@ def create_item(name, icon, keyword, description, on_enter):
     return ExtensionResultItem(
             name=name,
             description=description,
-            icon='images/{}.svg'.format(icon),
+            icon="images/{}.svg".format(icon),
             on_enter=ExtensionCustomAction(
-                 {'id': on_enter})
+                 {"id": on_enter})
             )
 
 
@@ -188,5 +197,5 @@ def profile_details(profile_path):
         return "", "", "rdp"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     RemminaExtension().run()
