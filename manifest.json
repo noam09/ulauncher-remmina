@@ -1,6 +1,5 @@
 {
-  "manifest_version": "1",
-  "api_version": "1",
+  "required_api_version": "^2.0.0",
   "name": "Remmina",
   "description": "Quick access to Remmina profiles",
   "developer_name": "noam09",
