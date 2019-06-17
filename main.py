@@ -135,7 +135,7 @@ def sort_by_usage(i):
     global usage_cache
     # Convert item name to ID format
     # j = i._name.lower()
-    base = os.path.basename(i._keyword.lower())
+    base = os.path.basename(i._keyword)
     j = os.path.splitext(base)[0]
     # Return score according to usage
     if j in usage_cache:
