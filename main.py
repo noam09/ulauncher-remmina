@@ -106,7 +106,7 @@ class ItemEnterEventListener(EventListener):
         # Get query
         data = event.get_data()
         on_enter = data["id"]
-        # The profilefile name is the ID
+        # The profile file name is the ID
         base = os.path.basename(on_enter)
         b = os.path.splitext(base)[0]
         # Check usage and increment
@@ -124,6 +124,7 @@ def create_item(name, icon, keyword, description, on_enter):
     return ExtensionResultItem(
             name=name,
             description=description,
+            keyword=keyword,
             icon="images/{}.svg".format(icon),
             on_enter=ExtensionCustomAction(
                  {"id": on_enter})
@@ -133,7 +134,9 @@ def create_item(name, icon, keyword, description, on_enter):
 def sort_by_usage(i):
     global usage_cache
     # Convert item name to ID format
-    j = i._name.lower()
+    # j = i._name.lower()
+    base = os.path.basename(i._keyword.lower())
+    j = os.path.splitext(base)[0]
     # Return score according to usage
     if j in usage_cache:
         return usage_cache[j]
