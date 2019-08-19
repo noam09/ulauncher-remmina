@@ -147,7 +147,7 @@ def profile_details(profile_path):
             # Read profile file lines
             lines = f.read().split("\n")
             # Initialize strings
-            desc = name = username = group = proto = ""
+            desc = name = username = group = proto = server = ""
             # Parse lines for relevant details
             for line in lines:
                 # Profile name
