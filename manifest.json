@@ -19,7 +19,7 @@
       "id": "profiles",
       "type": "input",
       "name": "Remmina Profiles Directory",
-      "description": "Where Remmina stores profile configuration files <br /><code>~/.local/share/remmina</code> and <code>~/.remmina</code> are checked by default",
+      "description": "Where Remmina stores profile configuration files. `~/.local/share/remmina` and `~/.remmina` are checked by default",
       "default_value": ""
     }
   ]
