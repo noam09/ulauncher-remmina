@@ -87,7 +87,7 @@ class RemminaExtension(Extension):
 class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
         global remmina_profiles_path
-        if extension.preferences["profiles"] is not "" \
+        if extension.preferences["profiles"] != "" \
            or not remmina_profiles_path:
             # Tilde (~) won't work alone, need expanduser()
             remmina_profiles_path = os.path.expanduser(extension.preferences["profiles"])
