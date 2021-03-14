@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import shlex
 import distutils.spawn
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
@@ -117,7 +118,7 @@ class ItemEnterEventListener(EventListener):
         # Update usage JSON
         with open(usage_db, 'w') as db:
             db.write(json.dumps(usage_cache, indent=2))
-        return RunScriptAction('#!/usr/bin/env bash\n{} -c {}\n'.format(remmina_bin, on_enter), None).run()
+        return RunScriptAction('#!/usr/bin/env bash\n{} -c {}\n'.format(remmina_bin, shlex.quote(on_enter)), None).run()
 
 
 def create_item(name, icon, keyword, description, on_enter):
