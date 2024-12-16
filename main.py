@@ -2,7 +2,6 @@ import os
 import json
 import logging
 import shlex
-import shutil
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
@@ -11,6 +10,19 @@ from ulauncher.api.shared.item.SmallResultItem import SmallResultItem
 from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
 from ulauncher.api.shared.action.RunScriptAction import RunScriptAction
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
+
+try:
+    import distutils.spawn
+    use_distutils = True
+except ImportError:
+    use_distutils = False
+
+if not use_distutils:
+    try:
+        import shutil
+        use_shutil = True
+    except ImportError:
+        use_shutil = False
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -35,7 +47,13 @@ default_paths = ["{}/.local/share/remmina".format(os.environ.get('HOME')),
                  "{}/.remmina".format(os.environ.get('HOME'))]
 # remmina_profiles_path = "{}/.local/share/remmina".format(os.environ.get('HOME'))
 # remmina_profiles_path_alt = "{}/.remmina".format(os.environ.get('HOME'))
-remmina_bin = shutil.which('remmina')
+def find_executable(remmina_bin):
+    if use_distutils:
+        return distutils.spawn.find_executable('remmina')
+    elif USE_SHUTIL:
+        return shutil.which('remmina')
+    else:
+        return none
 # This extension is useless without remmina
 if remmina_bin is None or remmina_bin == "":
     logger.error("Remmina executable path could not be determined")
