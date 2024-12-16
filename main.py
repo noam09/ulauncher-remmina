@@ -49,12 +49,13 @@ default_paths = ["{}/.local/share/remmina".format(os.environ.get('HOME')),
 # remmina_profiles_path_alt = "{}/.remmina".format(os.environ.get('HOME'))
 def find_executable(remmina_bin):
     if use_distutils:
-        return distutils.spawn.find_executable('remmina')
+        return distutils.spawn.find_executable(remmina_bin)
     elif use_shutil:
-        return shutil.which('remmina')
+        return shutil.which(remmina_bin)
     else:
-        return none
+        return None
 # This extension is useless without remmina
+remmina_bin = find_executable('remmina')
 if remmina_bin is None or remmina_bin == "":
     logger.error("Remmina executable path could not be determined")
     exit()
