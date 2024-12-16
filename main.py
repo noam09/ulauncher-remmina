@@ -2,7 +2,7 @@ import os
 import json
 import logging
 import shlex
-import distutils.spawn
+import shutil
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
@@ -35,7 +35,7 @@ default_paths = ["{}/.local/share/remmina".format(os.environ.get('HOME')),
                  "{}/.remmina".format(os.environ.get('HOME'))]
 # remmina_profiles_path = "{}/.local/share/remmina".format(os.environ.get('HOME'))
 # remmina_profiles_path_alt = "{}/.remmina".format(os.environ.get('HOME'))
-remmina_bin = distutils.spawn.find_executable('remmina')
+remmina_bin = shutil.which('remmina')
 # This extension is useless without remmina
 if remmina_bin is None or remmina_bin == "":
     logger.error("Remmina executable path could not be determined")
