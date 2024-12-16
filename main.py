@@ -50,7 +50,7 @@ default_paths = ["{}/.local/share/remmina".format(os.environ.get('HOME')),
 def find_executable(remmina_bin):
     if use_distutils:
         return distutils.spawn.find_executable('remmina')
-    elif USE_SHUTIL:
+    elif use_shutil:
         return shutil.which('remmina')
     else:
         return none
